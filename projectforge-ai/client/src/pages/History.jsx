@@ -1,17 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, History, Star, Trash2, Filter, 
   ChevronRight, X, Code, ExternalLink, Download, 
   Layers, Database, Cpu, Terminal, ArrowRight,
-  Sparkles, Fingerprint, Activity
+  Fingerprint, Activity, ArrowLeftRight
 } from 'lucide-react';
 import axios from 'axios';
 import Magnetic from '../components/Magnetic';
+import { parseIdea } from '../utils/parser';
 
 const HistoryPage = () => {
   const [ideas, setIdeas] = useState([]);
   const [search, setSearch] = useState('');
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [selectedIdea, setSelectedIdea] = useState(null);
   const [filterDomain, setFilterDomain] = useState('All');
@@ -23,12 +26,15 @@ const HistoryPage = () => {
   const fetchIdeas = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/ideas', {
+      const res = await axios.get('http://localhost:5000/api/ideas/history', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setIdeas(res.data);
     } catch (err) {
       console.error(err);
+      if (err.response?.status === 401) {
+        navigate('/auth');
+      }
     } finally {
       setLoading(false);
     }
@@ -242,6 +248,14 @@ const HistoryPage = () => {
                       </button>
                     </Magnetic>
                     <Magnetic>
+                      <button 
+                        onClick={() => navigate('/compare')}
+                        className="group flex items-center gap-4 px-10 py-5 bg-white/5 border border-white/10 text-white font-black rounded-full hover:bg-white/10 transition-all text-sm"
+                      >
+                        <ArrowLeftRight className="w-5 h-5" /> COMPARE BLUEPRINT
+                      </button>
+                    </Magnetic>
+                    <Magnetic>
                       <button className="flex items-center gap-4 px-10 py-5 bg-white/5 border border-white/10 text-white font-black rounded-full hover:bg-white/10 transition-all text-sm">
                         <Download className="w-5 h-5" /> DOWNLOAD BLUEPRINT
                       </button>
@@ -263,9 +277,11 @@ const HistoryPage = () => {
   );
 };
 
-const ArchiveCard = ({ idea, idx, onSelect, onDelete }) => (
-  <Magnetic strength={0.1}>
-    <motion.div
+const ArchiveCard = ({ idea, idx, onSelect, onDelete }) => {
+  const normalized = parseIdea(idea);
+  return (
+    <Magnetic strength={0.1}>
+      <motion.div
       layoutId={`card-${idea._id}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -280,7 +296,7 @@ const ArchiveCard = ({ idea, idx, onSelect, onDelete }) => (
 
       <div className="flex justify-between items-start mb-10 relative z-10">
         <div className="flex items-center gap-2 text-cyan-400 text-[10px] font-black uppercase tracking-[0.3em] bg-cyan-400/10 px-4 py-2 rounded-full border border-cyan-400/20 shadow-[0_0_20px_rgba(34,211,238,0.1)]">
-          <Sparkles className="w-4 h-4" /> Score: {idea.innovationScore}.0
+          <Star className="w-4 h-4" /> Score: {idea.innovationScore}.0
         </div>
         <button 
           onClick={onDelete}
@@ -292,22 +308,22 @@ const ArchiveCard = ({ idea, idx, onSelect, onDelete }) => (
       </div>
 
       <h3 className="font-black text-3xl md:text-4xl text-white mb-6 group-hover:text-cyan-400 transition-colors line-clamp-2 leading-none tracking-tighter uppercase relative z-10">
-        {idea.title}
+        {normalized.title}
       </h3>
       
       <p className="text-slate-500 text-lg line-clamp-3 mb-10 font-medium leading-relaxed relative z-10 flex-1">
-        {idea.description}
+        {normalized.description}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-10 relative z-10">
-        {idea.techStack.slice(0, 2).map((tech, i) => (
+        {normalized.tech_stack.slice(0, 2).map((tech, i) => (
           <span key={i} className="text-[10px] px-4 py-2 bg-slate-950 border border-white/5 rounded-xl text-slate-500 font-black uppercase tracking-widest">
             {tech}
           </span>
         ))}
-        {idea.techStack.length > 2 && (
+        {normalized.tech_stack.length > 2 && (
           <span className="text-[10px] px-4 py-2 bg-slate-950 border border-white/5 rounded-xl text-slate-700 font-black">
-            +{idea.techStack.length - 2}
+            +{normalized.tech_stack.length - 2}
           </span>
         )}
       </div>
@@ -319,8 +335,9 @@ const ArchiveCard = ({ idea, idx, onSelect, onDelete }) => (
         </div>
       </div>
     </motion.div>
-  </Magnetic>
-);
+    </Magnetic>
+  );
+};
 
 const HighEndMetric = ({ label, score, color }) => (
   <div className="space-y-4">

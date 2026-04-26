@@ -2,132 +2,190 @@ import express from 'express';
 import Idea from '../models/Idea.js';
 import User from '../models/User.js';
 import { auth } from '../middleware/auth.js';
-import { generateEmbedding, generateIdea } from '../ai/rag.js';
+import { generateEmbedding } from '../ai/rag.js';
+import { generateIdeas } from '../engines/ideaEngine.js';
+import { validateIdea } from '../engines/validationEngine.js';
+import { evaluateIdea } from '../engines/evaluationEngine.js';
+import { generateArchitecture } from '../engines/architectureEngine.js';
+import { suggestImprovements } from '../engines/improvementEngine.js';
+import { compareIdeas } from '../engines/comparisonEngine.js';
 
 const router = express.Router();
 
-// Helper for cosine similarity
-function cosineSimilarity(A, B) {
-  let dotProduct = 0;
-  let normA = 0;
-  let normB = 0;
-  for (let i = 0; i < A.length; i++) {
-    dotProduct += A[i] * B[i];
-    normA += A[i] * A[i];
-    normB += B[i] * B[i];
-  }
-  if (normA === 0 || normB === 0) return 0;
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-
+/**
+ * @route   POST /api/ideas/generate
+ * @desc    Generate unique project ideas based on user profile
+ */
 router.post('/generate', auth, async (req, res) => {
   try {
+    console.log(`[API] POST /api/ideas/generate - User ID: ${req.user.id}`);
+    
     const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const ideas = await generateIdeas(user, 3);
     
-    // Fetch all existing ideas to prevent duplicates
-    const existingIdeas = await Idea.find({}, 'title description embedding');
-    const existingTitles = existingIdeas.map(i => i.title);
-
-    let isDuplicate = true;
-    let attempts = 0;
-    let newIdeaData;
-    let newEmbedding;
-
-    // Retry loop to ensure uniqueness
-    while (isDuplicate && attempts < 3) {
-      attempts++;
-      newIdeaData = await generateIdea(user, existingTitles);
-      newEmbedding = await generateEmbedding(`${newIdeaData.title} ${newIdeaData.description}`);
-      
-      if (!newEmbedding) {
-        return res.status(500).json({ message: 'Failed to generate embedding' });
-      }
-
-      // Check similarity
-      isDuplicate = false;
-      for (const idea of existingIdeas) {
-        if (idea.embedding && idea.embedding.length > 0) {
-          const sim = cosineSimilarity(newEmbedding, idea.embedding);
-          if (sim > 0.8) {
-            isDuplicate = true;
-            break;
-          }
-        }
-      }
-    }
-
-    if (isDuplicate) {
-      return res.status(500).json({ message: 'Failed to generate a unique idea after multiple attempts. Please try again.' });
-    }
-
-    const newIdea = new Idea({
-      ...newIdeaData,
-      user: req.user.id,
-      embedding: newEmbedding
-    });
-
-    await newIdea.save();
-    
-    res.status(201).json({
-      success: true,
-      data: newIdea
-    });
+    res.json({ success: true, data: ideas });
   } catch (error) {
-    console.error(`[API Error] POST /api/ideas/generate:`, error);
-    res.status(500).json({ 
-      success: false, 
-      error: "Server error generating idea. The AI provider might be experiencing high traffic." 
-    });
+    console.error("❌ GENERATE ERROR:", error);
+    res.status(500).json({ success: false, message: "Failed to generate ideas", error: error.message });
   }
 });
 
-router.get('/', auth, async (req, res) => {
+/**
+ * @route   POST /api/ideas/save
+ * @desc    Save selected idea and run initial validation/evaluation
+ */
+router.post('/save', auth, async (req, res) => {
+  try {
+    const { ideaData } = req.body;
+    if (!ideaData || !ideaData.title) {
+      return res.status(400).json({ message: "Incomplete idea data provided" });
+    }
+
+    const newIdea = new Idea({
+      ...ideaData,
+      user: req.user.id
+    });
+
+    // Neural Pre-processing
+    const validation = await validateIdea(newIdea);
+    newIdea.isUnique = validation.isUnique;
+    newIdea.similarityResults = validation;
+
+    const evaluation = await evaluateIdea(newIdea);
+    newIdea.evaluations = [evaluation];
+
+    const embedding = await generateEmbedding(`${newIdea.title} ${newIdea.description}`);
+    if (embedding) newIdea.embedding = embedding;
+
+    await newIdea.save();
+    console.log(`✅ Idea Saved: ${newIdea.title}`);
+
+    res.status(201).json({ success: true, data: newIdea });
+  } catch (error) {
+    console.error("❌ SAVE ERROR:", error);
+    res.status(500).json({ success: false, message: "Failed to save idea", error: error.message });
+  }
+});
+
+/**
+ * @route   GET /api/ideas/architecture/:id
+ * @desc    Fetch or generate architectural blueprint
+ */
+router.get('/architecture/:id', auth, async (req, res) => {
+  try {
+    if (!req.params.id) return res.status(400).json({ message: "Idea ID required" });
+
+    const idea = await Idea.findOne({ _id: req.params.id, user: req.user.id });
+    if (!idea) return res.status(404).json({ message: "Idea not found" });
+
+    if (idea.architecture && Object.keys(idea.architecture).length > 0) {
+      return res.json(idea.architecture);
+    }
+
+    console.log(`🧠 Synthesizing architecture for: ${idea.title}`);
+    const architecture = await generateArchitecture(idea);
+    
+    idea.architecture = architecture;
+    await idea.save();
+
+    res.json(architecture);
+  } catch (error) {
+    console.error("❌ ARCHITECTURE ERROR:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+});
+
+/**
+ * @route   GET /api/ideas/improve/:id
+ * @desc    Fetch or generate improvement suggestions
+ */
+router.get('/improve/:id', auth, async (req, res) => {
+  try {
+    if (!req.params.id) return res.status(400).json({ message: "Idea ID required" });
+
+    const idea = await Idea.findOne({ _id: req.params.id, user: req.user.id });
+    if (!idea) return res.status(404).json({ message: "Idea not found" });
+
+    const improvements = await suggestImprovements(idea);
+    idea.improvements = improvements;
+    await idea.save();
+
+    res.json(improvements);
+  } catch (error) {
+    console.error("❌ IMPROVEMENT ERROR:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+});
+
+/**
+ * @route   POST /api/ideas/compare
+ * @desc    Cross-analyze two ideas
+ */
+router.post('/compare', auth, async (req, res) => {
+  try {
+    const { idA, idB } = req.body;
+    if (!idA || !idB) return res.status(400).json({ message: "Two ideas (idA, idB) required for comparison" });
+
+    const [ideaA, ideaB] = await Promise.all([
+      Idea.findById(idA),
+      Idea.findById(idB)
+    ]);
+
+    if (!ideaA || !ideaB) return res.status(404).json({ message: "One or both ideas not found" });
+
+    const result = await compareIdeas(ideaA, ideaB);
+    res.json(result);
+  } catch (error) {
+    console.error("❌ COMPARE ERROR:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+});
+
+/**
+ * @route   GET /api/ideas/history
+ * @desc    Get user's project archive
+ */
+router.get('/history', auth, async (req, res) => {
   try {
     const ideas = await Idea.find({ user: req.user.id }).sort({ createdAt: -1 });
     res.json(ideas);
   } catch (error) {
-    res.status(500).json({ message: 'Server error fetching ideas' });
+    console.error("❌ HISTORY ERROR:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 });
 
-// Semantic search route
-router.post('/search', auth, async (req, res) => {
-  try {
-    const { query } = req.body;
-    const queryEmbedding = await generateEmbedding(query);
-    
-    if (!queryEmbedding) return res.status(400).json({ message: "Failed to process query" });
-
-    const allIdeas = await Idea.find({ user: req.user.id });
-    
-    const scoredIdeas = allIdeas.map(idea => ({
-      ...idea.toObject(),
-      score: idea.embedding ? cosineSimilarity(queryEmbedding, idea.embedding) : 0
-    })).sort((a, b) => b.score - a.score).slice(0, 5); // top 5
-
-    res.json(scoredIdeas);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error searching ideas' });
-  }
-});
-
+/**
+ * @route   GET /api/ideas/:id
+ * @desc    Get single idea details
+ */
 router.get('/:id', auth, async (req, res) => {
   try {
     const idea = await Idea.findOne({ _id: req.params.id, user: req.user.id });
-    if (!idea) return res.status(404).json({ message: 'Idea not found' });
+    if (!idea) return res.status(404).json({ message: "Idea not found" });
     res.json(idea);
   } catch (error) {
-    res.status(500).json({ message: 'Server error fetching idea' });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+/**
+ * @route   GET /api/ideas/stats/trending
+ * @desc    Get trending tech stack statistics
+ */
+router.get('/stats/trending', auth, async (req, res) => {
   try {
-    const idea = await Idea.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-    if (!idea) return res.status(404).json({ message: 'Idea not found' });
-    res.json({ message: 'Idea deleted successfully' });
+    const stats = await Idea.aggregate([
+      { $unwind: "$tech_stack" },
+      { $group: { _id: "$tech_stack", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 }
+    ]);
+    res.json(stats);
   } catch (error) {
-    res.status(500).json({ message: 'Server error deleting idea' });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 });
 

@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Sparkles, LogOut, LayoutDashboard, Home, 
+  Star, LogOut, LayoutDashboard, Home, Zap, ArrowLeftRight,
   History, User, Settings, Menu, X, ChevronDown 
 } from 'lucide-react';
 import { useState } from 'react';
@@ -26,7 +26,7 @@ const Navbar = () => {
         {/* Logo */}
         <Link to={token ? "/home" : "/"} className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-sky-500 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
-            <Sparkles className="w-5 h-5 text-[#0B0F19]" />
+            <Star className="w-5 h-5 text-[#0B0F19]" />
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-lg text-white tracking-tight leading-none">ProjectForge</span>
@@ -38,6 +38,8 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-1">
             <NavLink to="/home" icon={<Home className="w-4 h-4" />} label="Home" current={location.pathname} />
             <NavLink to="/dashboard" icon={<LayoutDashboard className="w-4 h-4" />} label="Analytics" current={location.pathname} />
+            <NavLink to="/generator" icon={<Zap className="w-4 h-4" />} label="Generator" current={location.pathname} />
+            <NavLink to="/compare" icon={<ArrowLeftRight className="w-4 h-4" />} label="Compare" current={location.pathname} />
             <NavLink to="/history" icon={<History className="w-4 h-4" />} label="Archive" current={location.pathname} />
             
             <div className="h-6 w-px bg-white/10 mx-3" />
@@ -116,6 +118,8 @@ const Navbar = () => {
                 <>
                   <MobileNavLink to="/home" label="Home" onClick={() => setIsOpen(false)} />
                   <MobileNavLink to="/dashboard" label="Analytics" onClick={() => setIsOpen(false)} />
+                  <MobileNavLink to="/generator" label="Generator" onClick={() => setIsOpen(false)} />
+                  <MobileNavLink to="/compare" label="Compare" onClick={() => setIsOpen(false)} />
                   <MobileNavLink to="/history" label="Archive" onClick={() => setIsOpen(false)} />
                   <MobileNavLink to="/profile" label="Profile" onClick={() => setIsOpen(false)} />
                   <MobileNavLink to="/settings" label="Settings" onClick={() => setIsOpen(false)} />

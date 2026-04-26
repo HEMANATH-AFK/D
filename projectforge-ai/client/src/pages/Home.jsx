@@ -37,7 +37,7 @@ const Home = () => {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/ideas', {
+      const res = await axios.get('http://localhost:5000/api/ideas/history', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = res.data;
@@ -92,7 +92,7 @@ const Home = () => {
                 <motion.button 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => window.dispatchEvent(new CustomEvent('toggle-chatbot'))}
+                  onClick={() => navigate('/generator')}
                   disabled={loading}
                   data-cursor="GENERATE"
                   className="px-14 py-7 bg-white text-black font-black rounded-full transition-all disabled:opacity-50 flex items-center gap-4 text-xl shadow-[0_0_50px_rgba(255,255,255,0.2)]"
@@ -162,7 +162,7 @@ const Home = () => {
           )}
         </AnimatePresence>
 
-        {/* 3. HIGH-END GLASS STATS (REPLACING THE OLD ONES) */}
+        {/* 3. HIGH-END GLASS STATS */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-10">
           <HighEndGlassCard 
             label="SYNTHESIS VOLUME" 
@@ -173,7 +173,7 @@ const Home = () => {
           <HighEndGlassCard 
             label="SEMANTIC ACCURACY" 
             value={stats.avgScore} 
-            suffix="9/11"
+            suffix="/100"
             icon={<Activity className="w-6 h-6" />}
             cursor="ACCURACY"
           />
@@ -186,7 +186,7 @@ const Home = () => {
           />
         </section>
 
-        {/* 4. LIVE SIGNAL FLUX (NEW COMPONENT) */}
+        {/* 4. LIVE SIGNAL FLUX */}
         <section className="space-y-8">
           <div className="flex items-center gap-3">
              <Radio className="w-5 h-5 text-cyan-400" />
@@ -195,19 +195,14 @@ const Home = () => {
           <div className="w-full h-32 bg-white/5 border border-white/10 rounded-[2.5rem] overflow-hidden relative backdrop-blur-xl">
              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/5 to-transparent animate-shimmer" />
              <svg className="w-full h-full p-8" viewBox="0 0 1000 100" preserveAspectRatio="none">
-               <motion.path
-                 d="M0 50 Q 50 20, 100 50 T 200 50 T 300 80 T 400 50 T 500 20 T 600 50 T 700 80 T 800 50 T 900 20 T 1000 50"
-                 fill="none"
-                 stroke="rgba(34, 211, 238, 0.4)"
-                 strokeWidth="2"
-                 animate={{
-                   d: [
-                     "M0 50 Q 50 80, 100 50 T 200 50 T 300 20 T 400 50 T 500 80 T 600 50 T 700 20 T 800 50 T 900 80 T 1000 50",
-                     "M0 50 Q 50 20, 100 50 T 200 50 T 300 80 T 400 50 T 500 20 T 600 50 T 700 80 T 800 50 T 900 20 T 1000 50"
-                   ]
-                 }}
-                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-               />
+                <motion.path
+                  d="M0 50 Q 50 20, 100 50 T 200 50 T 300 80 T 400 50 T 500 20 T 600 50 T 700 80 T 800 50 T 900 20 T 1000 50"
+                  fill="none"
+                  stroke="rgba(34, 211, 238, 0.4)"
+                  strokeWidth="2"
+                  animate={{ opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                />
              </svg>
           </div>
         </section>
@@ -240,16 +235,16 @@ const Home = () => {
             {recentIdeas.map((item, idx) => (
               <Magnetic key={idx} strength={0.1}>
                 <div 
-                  onClick={() => setIdea(item)}
+                  onClick={() => navigate(`/idea/${item._id}`)}
                   className="p-8 bg-white/5 border border-white/10 rounded-[2.5rem] hover:bg-white/10 hover:border-cyan-500/30 transition-all cursor-pointer group"
                 >
                    <div className="flex justify-between items-start mb-8">
                      <span className="text-[10px] font-black text-slate-500 group-hover:text-cyan-400 transition-colors uppercase tracking-widest">Shard {idx + 1}</span>
                      <div className="text-xl font-black text-white tracking-tighter">{item.innovationScore}%</div>
                    </div>
-                   <h4 className="text-lg font-black text-slate-200 group-hover:text-white transition-colors tracking-tight mb-4">{item.title}</h4>
+                   <h4 className="text-lg font-black text-slate-200 group-hover:text-white transition-colors tracking-tight mb-4 line-clamp-1">{item.title}</h4>
                    <div className="flex flex-wrap gap-2">
-                     {item.techStack.slice(0, 2).map((tech, i) => (
+                     {item.techStack?.slice(0, 2).map((tech, i) => (
                         <span key={i} className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">#{tech}</span>
                      ))}
                    </div>

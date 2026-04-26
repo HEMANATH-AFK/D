@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, Bot, User, Sparkles, Trash2, Maximize2 } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Star, Trash2, Maximize2 } from 'lucide-react';
 import axios from 'axios';
 
 const StreamingText = ({ text }) => {
@@ -105,7 +105,7 @@ const Chatbot = () => {
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-sky-500" />
               <div className="flex items-center gap-5">
                 <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center relative">
-                  <Sparkles className="w-6 h-6 text-cyan-400" />
+                  <Star className="w-6 h-6 text-cyan-400" />
                   <div className="absolute inset-0 bg-cyan-400/20 blur-xl rounded-full opacity-50" />
                 </div>
                 <div>
@@ -123,7 +123,7 @@ const Chatbot = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-10 space-y-10 scrollbar-hide">
+            <div className="flex-1 overflow-y-auto p-10 space-y-10 scrollbar-hide" data-lenis-prevent>
               {messages.map((msg, idx) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 15, scale: 0.95 }}

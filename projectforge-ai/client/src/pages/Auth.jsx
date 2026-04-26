@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Lock, User, Sparkles, ArrowRight, Code, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Star, ArrowRight, Code, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -45,7 +45,7 @@ const Auth = () => {
             whileHover={{ scale: 1.1, rotate: 10 }}
             className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-sky-500 flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(34,211,238,0.2)]"
           >
-            <Sparkles className="w-10 h-10 text-black" />
+            <Star className="w-10 h-10 text-black" />
           </motion.div>
           <h2 className="text-4xl font-bold text-white tracking-tight mb-3">
             {isLogin ? 'Access Node' : 'Establish Identity'}

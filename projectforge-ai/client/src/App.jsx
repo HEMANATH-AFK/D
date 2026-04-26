@@ -10,6 +10,9 @@ import Dashboard from './pages/Dashboard';
 import HistoryPage from './pages/History';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import Generator from './pages/Generator';
+import IdeaDetails from './pages/IdeaDetails';
+import Compare from './pages/Compare';
 import Navbar from './components/Navbar';
 import Chatbot from './components/Chatbot';
 import Loader from './components/Loader';
@@ -85,6 +88,9 @@ function App() {
                   <Route path="/history" element={token ? <HistoryPage /> : <Navigate to="/auth" />} />
                   <Route path="/profile" element={token ? <Profile /> : <Navigate to="/auth" />} />
                   <Route path="/settings" element={token ? <Settings /> : <Navigate to="/auth" />} />
+                  <Route path="/generator" element={token ? <Generator /> : <Navigate to="/auth" />} />
+                  <Route path="/compare" element={token ? <Compare /> : <Navigate to="/auth" />} />
+                  <Route path="/idea/:id" element={token ? <IdeaDetails /> : <Navigate to="/auth" />} />
                 </Routes>
               </PageTransition>
             </main>

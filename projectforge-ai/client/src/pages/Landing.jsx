@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform, AnimatePresence, useSpring } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
-  Sparkles, Brain, Rocket, Shield, Zap, Globe, Cpu, Database, 
+  Star, Brain, Rocket, Shield, Zap, Globe, Cpu, Database, 
   ArrowRight, Layers, Fingerprint, Activity, Terminal, 
   Compass, Hexagon, Radio, Scan 
 } from 'lucide-react';
@@ -203,7 +203,7 @@ const Landing = () => {
       {/* Footer Branding */}
       <footer className="py-32 border-t border-white/5 text-center">
         <div className="flex flex-col items-center gap-8 opacity-40">
-          <Sparkles className="w-12 h-12 text-cyan-400" />
+          <Star className="w-12 h-12 text-cyan-400" />
           <span className="text-[12px] font-black uppercase tracking-[1.5em] text-slate-500">ProjectForge Architectural System © 2026</span>
         </div>
       </footer>

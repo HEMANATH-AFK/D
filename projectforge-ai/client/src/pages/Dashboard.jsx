@@ -5,6 +5,7 @@ import {
   ChevronRight, Calendar, ArrowUpRight 
 } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Magnetic from '../components/Magnetic';
 
 // 1. AI THINKING CORE
@@ -71,14 +72,8 @@ const LiveSignalStream = () => {
           fill="none"
           stroke="rgba(34, 211, 238, 0.4)"
           strokeWidth="2"
-          animate={{
-            d: [
-              "M0 50 Q 50 80, 100 50 T 200 50 T 300 20 T 400 50 T 500 80 T 600 50 T 700 20 T 800 50 T 900 80 T 1000 50",
-              "M0 50 Q 50 20, 100 50 T 200 50 T 300 80 T 400 50 T 500 20 T 600 50 T 700 80 T 800 50 T 900 20 T 1000 50",
-              "M0 50 Q 50 80, 100 50 T 200 50 T 300 20 T 400 50 T 500 80 T 600 50 T 700 20 T 800 50 T 900 80 T 1000 50"
-            ]
-          }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ opacity: [0.2, 0.5, 0.2] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         />
         {/* Moving Particles */}
         {[...Array(5)].map((_, i) => (
@@ -99,11 +94,12 @@ const LiveSignalStream = () => {
 };
 
 // 3. IDEA DNA CARDS
-const IdeaDNACard = ({ idea }) => (
+const IdeaDNACard = ({ idea, navigate }) => (
   <Magnetic strength={0.15}>
     <motion.div 
       whileHover={{ scale: 1.02 }}
-      className="relative p-8 w-full min-h-[220px] transition-all group"
+      onClick={() => navigate(`/idea/${idea._id}`)}
+      className="relative p-8 w-full min-h-[220px] transition-all group cursor-pointer"
     >
       {/* Organic Shape Backdrop */}
       <div className="absolute inset-0 bg-white/5 border border-white/10 backdrop-blur-xl group-hover:border-cyan-500/50 transition-colors" 
@@ -130,7 +126,7 @@ const IdeaDNACard = ({ idea }) => (
 );
 
 // 4. NEURAL TIMELINE
-const NeuralTimeline = ({ ideas }) => (
+const NeuralTimeline = ({ ideas, navigate }) => (
   <div className="relative pl-12 space-y-12">
     <div className="absolute left-4 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-500/50 via-white/5 to-transparent" />
     {ideas.slice(0, 5).map((idea, idx) => (
@@ -144,7 +140,10 @@ const NeuralTimeline = ({ ideas }) => (
         <div className="absolute -left-12 top-0 w-8 h-8 rounded-full bg-[#0B0F19] border border-cyan-500 flex items-center justify-center shadow-[0_0_15px_rgba(34,211,238,0.3)] group-hover:scale-125 transition-transform">
           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
         </div>
-        <div className="bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-md hover:bg-white/10 transition-colors cursor-pointer group">
+        <div 
+          onClick={() => navigate(`/idea/${idea._id}`)}
+          className="bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-md hover:bg-white/10 transition-colors cursor-pointer group"
+        >
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{new Date(idea.createdAt).toLocaleDateString()}</span>
             <ArrowUpRight className="w-4 h-4 text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -158,7 +157,9 @@ const NeuralTimeline = ({ ideas }) => (
 
 const Dashboard = () => {
   const [data, setData] = useState([]);
+  const [trending, setTrending] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
@@ -167,10 +168,16 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/ideas', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setData(res.data);
+      const [historyRes, trendingRes] = await Promise.all([
+        axios.get('http://localhost:5000/api/ideas/history', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('http://localhost:5000/api/ideas/stats/trending', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+      setData(historyRes.data);
+      setTrending(trendingRes.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -236,7 +243,7 @@ const Dashboard = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {data.slice(0, 4).map((idea, idx) => (
-                <IdeaDNACard key={idx} idea={idea} />
+                <IdeaDNACard key={idx} idea={idea} navigate={navigate} />
               ))}
             </div>
           </section>
@@ -248,14 +255,42 @@ const Dashboard = () => {
             <Cpu className="w-4 h-4 text-indigo-400" />
             <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-white">Neural Timeline</h2>
           </div>
-          <NeuralTimeline ideas={data} />
+          <NeuralTimeline ideas={data} navigate={navigate} />
           
-          {/* Action Card */}
+          {/* Trending Tech Stack */}
+          <div className="p-10 rounded-[3rem] bg-white/5 border border-white/10 backdrop-blur-3xl space-y-8 mb-12">
+            <div className="flex items-center gap-3">
+              <Activity className="w-5 h-5 text-cyan-400" />
+              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">Trending Neural Nodes</h3>
+            </div>
+            <div className="space-y-6">
+              {trending.map((tech, idx) => (
+                <div key={idx} className="space-y-2">
+                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                    <span className="text-white">{tech._id}</span>
+                    <span className="text-cyan-400">{tech.count} Ideas</span>
+                  </div>
+                  <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(tech.count / (trending[0]?.count || 1)) * 100}%` }}
+                      className="h-full bg-cyan-500 shadow-[0_0_10px_#22D3EE]"
+                    />
+                  </div>
+                </div>
+              ))}
+              {trending.length === 0 && <p className="text-xs text-slate-500 italic">Analyzing market flux...</p>}
+            </div>
+          </div>
+
           <div className="mt-20 p-8 rounded-[3rem] bg-gradient-to-br from-cyan-500 to-sky-600 border border-white/10 text-black">
             <h3 className="text-3xl font-black tracking-tight mb-4 leading-none">Expand Neural Network.</h3>
             <p className="text-black/60 font-bold text-sm mb-8">Synthesize more blueprints to increase your feasibility index.</p>
             <Magnetic>
-              <button className="w-full py-4 bg-black text-white rounded-full font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform">
+              <button 
+                onClick={() => navigate('/generator')}
+                className="w-full py-4 bg-black text-white rounded-full font-black text-xs uppercase tracking-widest hover:scale-105 transition-transform"
+              >
                 Initialize Forge
               </button>
             </Magnetic>

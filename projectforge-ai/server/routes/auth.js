@@ -64,7 +64,8 @@ router.put('/profile', auth, async (req, res) => {
     ).select('-password');
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error("❌ PROFILE UPDATE ERROR:", error);
+    res.status(500).json({ message: 'Server error', details: error.message });
   }
 });
 

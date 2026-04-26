@@ -6,7 +6,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 export const generateEmbedding = async (text) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+    const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
     const result = await model.embedContent(text);
     return result.embedding.values;
   } catch (error) {
@@ -17,7 +17,7 @@ export const generateEmbedding = async (text) => {
 
 export const generateIdea = async (userProfile, existingTitles) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-3.1-pro-preview-customtools" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro-latest" });
     
     const prompt = `
       You are an expert AI project generator.
