@@ -1,5 +1,13 @@
 import { callAI } from '../ai/geminiService.js';
 
+/**
+ * Validates a generated project idea against existing SaaS solutions and open-source projects.
+ * 
+ * @param {Object} idea - The project idea object to validate.
+ * @param {string} idea.title - The title of the idea.
+ * @param {string} idea.description - The description of the idea.
+ * @returns {Promise<Object>} The validation result containing uniqueness score, similarity references, and market analysis.
+ */
 export const validateIdea = async (idea) => {
   const prompt = `
 You are a market researcher and project validator. 
