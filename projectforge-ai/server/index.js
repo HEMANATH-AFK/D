@@ -8,6 +8,10 @@ import chatRoutes from './routes/chat.js';
 
 dotenv.config();
 
+/**
+ * Express application entrypoint. Initializes middleware, sets up routes, 
+ * starts HTTP listener, and connects to MongoDB.
+ */
 const app = express();
 
 app.use(cors());
