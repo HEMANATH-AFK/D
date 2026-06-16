@@ -6,6 +6,10 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+/**
+ * Top navigation bar component. Renders logo, responsive nav links, 
+ * user profile dropdown, authorization buttons, and responsive hamburger mobile menus.
+ */
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
