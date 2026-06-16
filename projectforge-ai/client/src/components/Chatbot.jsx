@@ -3,6 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Bot, User, Star, Trash2, Maximize2 } from 'lucide-react';
 import axios from 'axios';
 
+/**
+ * A sub-component that simulates text streaming/typing effect by slicing 
+ * the text string with an interval timer.
+ * 
+ * @param {Object} props - Component props.
+ * @param {string} props.text - The complete text to stream out.
+ */
 const StreamingText = ({ text }) => {
   const [displayedText, setDisplayedText] = useState('');
   useEffect(() => {
@@ -17,6 +24,10 @@ const StreamingText = ({ text }) => {
   return <span>{displayedText}</span>;
 };
 
+/**
+ * Renders the floating chat assistant interface. Accesses the `/api/chat`
+ * endpoint to fetch RAG-grounded ideas context and brainstorming replies.
+ */
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
