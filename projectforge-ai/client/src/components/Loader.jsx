@@ -1,6 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
+/**
+ * A luxury animated preloader screen displaying particle tunnel effects
+ * and a stylized entrance animation before entering the application.
+ * 
+ * @param {Object} props - Component props.
+ * @param {Function} props.onComplete - Callback executed when the load phase finishes.
+ */
 const Loader = ({ onComplete }) => {
   const [phase, setPhase] = useState('start'); // start -> zoom -> complete
 
