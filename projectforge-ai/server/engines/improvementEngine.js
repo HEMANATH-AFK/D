@@ -1,6 +1,14 @@
 import { callAI } from '../ai/geminiService.js';
 import { safeJSONParse } from '../utils/aiHelper.js';
 
+/**
+ * Suggests technical, UX, and market improvements for an existing project idea.
+ * 
+ * @param {Object} idea - The project idea details.
+ * @param {string} idea.title - The title of the project.
+ * @param {string} idea.description - The description of the project.
+ * @returns {Promise<Object>} An object containing suggestions and next steps.
+ */
 export const suggestImprovements = async (idea) => {
   if (!idea) throw new Error("Missing idea context");
 
