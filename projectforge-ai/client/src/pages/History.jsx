@@ -11,6 +11,10 @@ import axios from 'axios';
 import Magnetic from '../components/Magnetic';
 import { parseIdea } from '../utils/parser';
 
+/**
+ * History/Archive page component. Fetches historically saved project blueprints
+ * from the database, listing them in a premium grid layout with details modal popups.
+ */
 const HistoryPage = () => {
   const [ideas, setIdeas] = useState([]);
   const [search, setSearch] = useState('');
