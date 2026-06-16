@@ -6,6 +6,11 @@ import { auth } from '../middleware/auth.js';
 
 const router = express.Router();
 
+/**
+ * @route   POST /api/auth/signup
+ * @desc    Register a new user, hash password, and issue JWT token
+ * @access  Public
+ */
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -27,6 +32,11 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+/**
+ * @route   POST /api/auth/login
+ * @desc    Authenticate user, verify password, and return JWT token
+ * @access  Public
+ */
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -45,6 +55,11 @@ router.post('/login', async (req, res) => {
   }
 });
 
+/**
+ * @route   GET /api/auth/me
+ * @desc    Get current logged-in user profile (excluding password)
+ * @access  Private
+ */
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -54,6 +69,11 @@ router.get('/me', auth, async (req, res) => {
   }
 });
 
+/**
+ * @route   PUT /api/auth/profile
+ * @desc    Update user profile details (skills, interests, domain)
+ * @access  Private
+ */
 router.put('/profile', auth, async (req, res) => {
   try {
     const { skills, interests, domain } = req.body;
