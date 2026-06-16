@@ -1,6 +1,15 @@
 import { callAI } from '../ai/geminiService.js';
 import { safeJSONParse } from '../utils/aiHelper.js';
 
+/**
+ * Performs a multi-dimensional comparative analysis between two project blueprints.
+ * 
+ * @param {Object} ideaA - The first project idea to compare.
+ * @param {string} ideaA.title - The title of the first project.
+ * @param {Object} ideaB - The second project idea to compare.
+ * @param {string} ideaB.title - The title of the second project.
+ * @returns {Promise<Object>} An object containing the verdict, strategic recommendation, and metrics.
+ */
 export const compareIdeas = async (ideaA, ideaB) => {
   if (!ideaA || !ideaB) throw new Error("Two ideas required for comparison");
 
