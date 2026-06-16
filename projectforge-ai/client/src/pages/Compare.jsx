@@ -8,6 +8,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Magnetic from '../components/Magnetic';
 
+/**
+ * Compare page component. Allows side-by-side comparative analysis of 
+ * two saved blueprints utilizing the `/api/ideas/compare` endpoint.
+ */
 const Compare = () => {
   const [ideas, setIdeas] = useState([]);
   const [selection, setSelection] = useState({ idA: '', idB: '' });
