@@ -1,6 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, useSpring, useMotionValue, AnimatePresence, useTransform } from 'framer-motion';
 
+/**
+ * A GPU-accelerated custom cursor component featuring spring trails,
+ * hover element interactions (scale-up, rotation), and interactive crosshairs.
+ */
 const CustomCursor = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [hoverLabel, setHoverLabel] = useState('');
