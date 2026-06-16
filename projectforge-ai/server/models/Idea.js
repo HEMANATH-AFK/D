@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 
+/**
+ * Sub-schema for tracking evaluation metrics (innovation, feasibility, complexity) over time.
+ */
 const evaluationSchema = new mongoose.Schema({
   innovationScore: Number,
   feasibilityScore: Number,
@@ -12,6 +15,10 @@ const evaluationSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now }
 });
 
+/**
+ * Idea schema for persisted blueprints. Stores the system design architecture, 
+ * similarity index results, metrics, and high-dimensional embeddings for RAG.
+ */
 const ideaSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   title: { type: String, required: true },
