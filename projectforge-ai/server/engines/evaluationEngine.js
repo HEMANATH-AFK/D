@@ -1,5 +1,14 @@
 import { callAI } from '../ai/geminiService.js';
 
+/**
+ * Evaluates a project idea's engineering feasibility, innovation factor, complexity, and potential.
+ * 
+ * @param {Object} idea - The project idea details.
+ * @param {string} idea.title - The title of the project idea.
+ * @param {string} idea.description - Description of the project idea.
+ * @param {string[]} [idea.tech_stack] - The technologies associated with the project idea.
+ * @returns {Promise<Object>} An evaluation report containing numerical scores and pros/cons.
+ */
 export const evaluateIdea = async (idea) => {
   const prompt = `
 You are a senior tech lead evaluating a project idea.
