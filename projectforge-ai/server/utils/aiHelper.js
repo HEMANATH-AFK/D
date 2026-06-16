@@ -1,5 +1,8 @@
 /**
  * Robustly parses JSON from AI responses using regex to extract the first JSON object or array.
+ * 
+ * @param {string} text - Raw string output from the AI model.
+ * @returns {Object|Array|null} The parsed JSON object or array, or null if parsing fails.
  */
 export const safeJSONParse = (text) => {
   try {
@@ -14,8 +17,11 @@ export const safeJSONParse = (text) => {
 };
 
 /**
- * Calculates a basic Jaccard similarity between two strings based on words.
- * This is a lightweight alternative to external libraries.
+ * Calculates a Jaccard similarity coefficient between two strings based on tokenized words.
+ * 
+ * @param {string} str1 - First string for comparison.
+ * @param {string} str2 - Second string for comparison.
+ * @returns {number} Jaccard similarity coefficient (0 to 1).
  */
 export const getSimilarity = (str1, str2) => {
   const s1 = new Set(str1.toLowerCase().split(/\s+/));
@@ -26,7 +32,12 @@ export const getSimilarity = (str1, str2) => {
 };
 
 /**
- * Filters out ideas that are too similar to existing ones.
+ * Filters out generated project ideas that exceed the similarity threshold against existing ideas.
+ * 
+ * @param {Array<Object>} newIdeas - Array of newly generated idea candidates.
+ * @param {Array<Object>} existingIdeas - Array of historically saved ideas.
+ * @param {number} [threshold=0.4] - The Jaccard similarity threshold for rejection.
+ * @returns {Array<Object>} Filtered list of ideas.
  */
 export const filterDuplicates = (newIdeas, existingIdeas, threshold = 0.4) => {
   return newIdeas.filter(newIdea => {
