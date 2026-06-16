@@ -4,7 +4,9 @@ import { Float, Sphere, MeshDistortMaterial, Points, PointMaterial } from '@reac
 import * as THREE from 'three';
 import gsap from 'gsap';
 
-// 1. FAR BACKGROUND LAYER
+/**
+ * Renders the color-gradient shifting far background panel.
+ */
 const FarBackground = () => {
   const mesh = useRef();
   
