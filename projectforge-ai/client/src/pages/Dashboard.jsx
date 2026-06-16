@@ -8,7 +8,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Magnetic from '../components/Magnetic';
 
-// 1. AI THINKING CORE
+/**
+ * Dashboard page component. Renders the main telemetry metrics, 
+ * live signal simulations, saved blueprints, and trending tech stacks.
+ */
 const AIThinkingCore = ({ ideasCount, score }) => {
   return (
     <div className="relative w-full h-[400px] flex items-center justify-center overflow-visible">
