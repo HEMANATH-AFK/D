@@ -1,6 +1,14 @@
 import { callAI } from '../ai/geminiService.js';
 import { safeJSONParse } from '../utils/aiHelper.js';
 
+/**
+ * Generates system design blueprints (frontend, backend, database, services, and deployment strategy) for an idea.
+ * 
+ * @param {Object} idea - The project idea details.
+ * @param {string} idea.title - The title of the project.
+ * @param {string[]} idea.tech_stack - The core tech stack components.
+ * @returns {Promise<Object>} The system architecture design object.
+ */
 export const generateArchitecture = async (idea) => {
   if (!idea || !idea.title) {
     throw new Error("Missing idea context for architecture generation");
