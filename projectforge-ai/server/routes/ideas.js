@@ -20,9 +20,11 @@ router.post('/generate', auth, async (req, res) => {
   try {
     console.log(`[API] POST /api/ideas/generate - User ID: ${req.user.id}`);
     
+    // Retrieve user from DB to fetch their skills and domain
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Invoke specialized idea generation engine
     const ideas = await generateIdeas(user, 3);
     
     res.json({ success: true, data: ideas });
@@ -43,19 +45,22 @@ router.post('/save', auth, async (req, res) => {
       return res.status(400).json({ message: "Incomplete idea data provided" });
     }
 
+    // Create a new Idea instance with user association
     const newIdea = new Idea({
       ...ideaData,
       user: req.user.id
     });
 
-    // Neural Pre-processing
+    // 1. Run uniqueness check against existing repository index
     const validation = await validateIdea(newIdea);
     newIdea.isUnique = validation.isUnique;
     newIdea.similarityResults = validation;
 
+    // 2. Perform automated technical lead feasibility & innovation assessment
     const evaluation = await evaluateIdea(newIdea);
     newIdea.evaluations = [evaluation];
 
+    // 3. Generate vector embeddings for similarity searches
     const embedding = await generateEmbedding(`${newIdea.title} ${newIdea.description}`);
     if (embedding) newIdea.embedding = embedding;
 
