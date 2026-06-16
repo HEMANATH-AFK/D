@@ -5,6 +5,11 @@ import Idea from '../models/Idea.js';
 
 const router = express.Router();
 
+/**
+ * @route   POST /api/chat
+ * @desc    Submit a conversation request to the RAG-assisted brainstorming assistant
+ * @access  Private
+ */
 router.post('/', auth, async (req, res) => {
   try {
     const { messages } = req.body;
