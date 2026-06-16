@@ -4,6 +4,10 @@ import { Mail, Lock, User, Star, ArrowRight, Code, Loader2 } from 'lucide-react'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Authentication screen component. Handles dual modes of User Registration
+ * (Establish Identity) and Login (Access Node) via `/api/auth/` routes.
+ */
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
