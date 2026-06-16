@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
 
+/**
+ * User schema representing registered accounts, profiling tags, skills, and domains.
+ * Used for customizing AI-generated project suggestions.
+ */
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
