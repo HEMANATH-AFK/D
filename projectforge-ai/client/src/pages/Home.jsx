@@ -25,6 +25,10 @@ const CountUp = ({ value, duration = 1.5 }) => {
   return <span>{count}</span>;
 };
 
+/**
+ * Home page component. Displays the landing hero section for logged-in users,
+ * features a quick-generator action button, telemetry score modules, and recent blueprints.
+ */
 const Home = () => {
   const [loading, setLoading] = useState(false);
   const [idea, setIdea] = useState(null);
