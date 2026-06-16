@@ -2,6 +2,15 @@ import { callAI } from '../ai/geminiService.js';
 import Idea from '../models/Idea.js';
 import { safeJSONParse, filterDuplicates } from '../utils/aiHelper.js';
 
+/**
+ * Generates unique project ideas tailored to a user profile, applying RAG-based negative constraints.
+ * 
+ * @param {Object} userProfile - The profile of the user requesting ideas.
+ * @param {string[]} userProfile.skills - List of user skills.
+ * @param {string} userProfile.domain - Target domain of interest.
+ * @param {number} [count=3] - Number of ideas to generate.
+ * @returns {Promise<Array>} List of generated project ideas.
+ */
 export const generateIdeas = async (userProfile, count = 3) => {
   console.log("🚀 INITIATING IDEA GENERATION...");
 
