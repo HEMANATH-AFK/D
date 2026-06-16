@@ -9,6 +9,10 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Magnetic from '../components/Magnetic';
 
+/**
+ * Generator page component. Steps users through parameter input,
+ * AI idea synthesis selection, and real-time validation and evaluation displays.
+ */
 const Generator = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
